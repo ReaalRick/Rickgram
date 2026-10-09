@@ -69,9 +69,20 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace
 
+      - name: Find all APK files
+        if: always()
+        run: |
+          echo "=== All APK files in project ==="
+          find . -name "*.apk" -type f -exec ls -lh {} \; 2>/dev/null || echo "No APK found"
+          echo ""
+          echo "=== Contents of TMessagesProj/build/outputs ==="
+          find TMessagesProj/build/outputs -type f 2>/dev/null | head -50 || echo "no outputs"
+
       - name: Upload APK
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: rickgram-debug-apk
-          path: TMessagesProj/build/outputs/apk/debug/*.apk
+          path: '**/*.apk'
+          if-no-files-found: error
           retention-days: 30
